@@ -1,0 +1,98 @@
+1. change each host name by command  ...
+
+hostnamectl set-hostname (new-hostname)
+
+
+2.
+
+
+3. generate two keys one with passphrase system log in and one without for ansible and copy each pub key generated to each inventory host
+
+ssh-keygen -t ed25519 -C "Jasol's key 10/27/23"
+   16  cd .ssh
+   17  ls
+   18  ssh-copy-id -i ~/.ssh/id_ed25519.pub 192.168.59.10
+   19  ssh-copy-id -i ~/.ssh/id_ed25519.pub 192.168.59.11
+   20  ssh-copy-id -i ~/.ssh/id_ed25519.pub 192.168.59.12
+   21  ssh 192.168.59.10
+   22  history
+   23  ssh-keygen -t ed25519 -C "Jasol's ansible key 10/27/23"
+   24  ls
+   25  ssh-copy-id -i ~/.ssh/ansible.pub 192.168.59.10
+   26  ssh-copy-id -i ~/.ssh/ansible.pub 192.168.59.11
+   27  ssh-copy-id -i ~/.ssh/ansible.pub 192.168.59.12
+   28  history
+
+
+
+
+4. make sure we can log in using ssh command plus ip
+
+
+5. on the master/workstation linux box install ansible   ..... sudo apt install ansible
+6. add alias .............  alias ssha='eval $(ssh-agent) && ssh-add'  ... also into the ~/.bashrc file
+
+7. create inventory file ... just simply all the client ip
+
+
+8. create play book file and ansible.cfg files
+
+
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: update repository indexx
+    apt:
+      update_cache: yes
+
+
+  - name: install apache2 package
+    apt:
+      name: apache2
+      state: latest
+
+  - name: add php support for apache
+    apt:
+      name: libapache2-mod-php
+      state: latest
+
+
+
+config...
+
+[defaults]
+inventory = inventory
+private_key_file = ~/.ssh/ansible
+
+
+
+9.  some ad hoc commands .....
+ansible all --key-file ~/.ssh/ansible -i inventory  -m ping
+ ansible all --list-hosts
+  153  ansible all -m gather_facts
+  154  ansible all -m
+  155  ansible all -m gather_facts --limit 192.168.59.12
+161  ansible all -m gather_facts --limit 192.168.59.12 | grep fixed
+  162  ansible all -m apt
+  163  ansible all -m apt -a udpate_cache=true
+  164  ansible all -m apt -a udpate_cache=true --become --ask-become-pass
+  165  ansible all -m apt -a update_cache=true --become --ask-become-pass
+  166  history
+  167  ansible all -m apt -a update_cache=true --become --ask-become-pass
+  168  ansible version
+  169  ansible --version
+  170  ansible all -m apt -a name=vim-nox --become --ask-become-password
+  171  ansible all -m apt -a name=tree --become --ask-become-password
+  172  ansible all -m apt -a name=tree --become --ask-become-pass
+  173  ssh 192.168.59.11
+  174  ssha
+  175  ssh 192.168.59.11
+  176  vi ~/.bashrc
+  177  source ~/.bashrc
+  178  ssh 192.168.59.11
+  179  history
+  180  ansible all -m apt -a name=snapd --become --ask-become-pass
+  181  ansible all -m apt -a "name=snapd state=latest" --become --ask-become-pass
